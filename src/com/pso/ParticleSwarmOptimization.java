@@ -4,9 +4,9 @@ import java.util.Random;
 
 public class ParticleSwarmOptimization {
 	// 權重參數
-	private static double w, a1, a2;				
-	// 最大速度限制
-	private static double maxVelocity;					
+	private static double w, phi1, phi2;				
+	// 最大,小速度限制
+	private static double maxVelocity, minVelocity;					
 	// 最大,小位置限制
 	private static double maxPosition, minPosition;	
 	// 粒子數量
@@ -33,12 +33,13 @@ public class ParticleSwarmOptimization {
 	static void initialParameter() {
 		maxPosition = 100.0;
 		minPosition = -100.0;
+		maxVelocity = 4.0;
+		minVelocity = -4.0;
 		w = 1.0;
-		a1 = 2.0;
-		a2 = 2.0;
-		particleCount = 20;
-		maxVelocity = maxPosition - minPosition; 
-		iterator = 100000;
+		phi1 = 2.0;
+		phi2 = 2.0;
+		particleCount = 1000;
+		iterator = 1000;
 		particles = new Particle[particleCount];
 		random = new Random(System.currentTimeMillis());
 		globalBestParticle = new Particle();
@@ -47,10 +48,11 @@ public class ParticleSwarmOptimization {
 	static void initalParticle() {
 		for(int i = 0; i < particleCount; i++) {
 			particles[i] = new Particle();
-			double position = random.nextFloat() * maxVelocity + minPosition;
+			double position = random.nextDouble() * (maxPosition - minPosition) + minPosition;
 			particles[i].position = position;
 			particles[i].bestPostion = position;
-			particles[i].velocity = random.nextFloat() * maxVelocity;
+			double velocity = random.nextDouble() * (maxVelocity - minVelocity) + minVelocity;
+			particles[i].velocity = velocity;
 			double fitness = fit(particles[i].position);
 			particles[i].fintness = fitness;
 			particles[i].bestFitness = fitness;
@@ -63,8 +65,8 @@ public class ParticleSwarmOptimization {
 		for(int i = 0; i < particleCount; i++) {
 			// 更新速度
 			double velocity = updateVelocity(particles[i]);
-			if(velocity < -maxVelocity) {
-				velocity = -maxVelocity;
+			if(velocity < minVelocity) {
+				velocity = minVelocity;
 			} else if(velocity > maxVelocity) {
 				velocity = maxVelocity;
 			}
@@ -92,10 +94,10 @@ public class ParticleSwarmOptimization {
 	}
 	
 	static double updateVelocity(Particle particle) {
-		//w * v + a1 * random * (pbest-ppos) + a2 * random * (gbest-pos);
+		//w * v + phi1 * random * (pbest-ppos) + phi2 * random * (gbest-pos);
 		 double velocity = w * particle.velocity + 
-				 a1 * random.nextFloat() * (particle.bestPostion - particle.position) + 
-				 a2 * random.nextFloat() * (globalBestParticle.bestPostion - - particle.position);
+				 phi1 * random.nextFloat() * (particle.bestPostion - particle.position) + 
+				 phi2 * random.nextFloat() * (globalBestParticle.bestPostion - particle.position);
 		 return velocity;
 	}
 	
@@ -108,7 +110,38 @@ public class ParticleSwarmOptimization {
 	}
 	
 	static double fit(double x) {
-//		return AckleyFunction.ackleysFunction(x);
-		return Math.abs(8000.0 + x*(-10000.0+x*(-0.8+x)));
+		return ackleysFunction(x);
+//		return evalAckley(x);
+	}
+	
+	static double ackleysFunction(double x) {		
+		double sum1 = 0;
+        double sum2 = 0;
+        for (int i = 0; i < particleCount; i++) {
+            sum1 += x * x;
+            sum2 += Math.cos(2 * Math.PI * x);
+        }
+        double p1 = -20 * Math.exp(-0.2 * Math.sqrt((1.0 / particleCount) * sum1));
+        double p2 = Math.exp((1.0 / particleCount) * sum2);
+        return p1 - p2 + Math.E + 20;
+	}
+	
+	static double evalAckley(double x) {
+		
+		double a = 20.0;
+		double b = 0.2;
+		double c = 2 * Math.PI;
+		double firstSum = 0.0;
+		double secondSum = 0.0;
+		
+		for (int i = 0; i < particleCount; i++) {
+			firstSum += Math.pow(x, 2);
+			secondSum += Math.cos(c * x);
+		}
+		
+		firstSum = -b * Math.sqrt(firstSum / particleCount);
+		secondSum = secondSum / particleCount;
+		
+		return (-a * Math.exp(firstSum)) - secondSum + a + Math.E;
 	}
 }
