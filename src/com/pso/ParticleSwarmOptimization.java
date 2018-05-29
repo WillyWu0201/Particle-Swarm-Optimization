@@ -24,22 +24,22 @@ public class ParticleSwarmOptimization {
 		// TODO Auto-generated method stub
 		initialParameter();
 		initalParticle();
-		for(int i = 0; i < iterator; i++ ) {
+		for(int i = 0; i < iterator; i++) {
 			moveParticle();
 		}
 		System.out.println("done");
 	}
 	
 	static void initialParameter() {
-		maxPosition = 100.0;
-		minPosition = -100.0;
-		maxVelocity = 4.0;
-		minVelocity = -4.0;
+		maxPosition = 20.0;
+		minPosition = -20.0;
+		maxVelocity = 1.5;
+		minVelocity = -1.5;
 		w = 1.0;
-		phi1 = 2.0;
-		phi2 = 2.0;
-		particleCount = 1000;
-		iterator = 1000;
+		phi1 = 0.5;
+		phi2 = 0.5;
+		particleCount = 100;
+		iterator = 5000;
 		particles = new Particle[particleCount];
 		random = new Random(System.currentTimeMillis());
 		globalBestParticle = new Particle();
@@ -83,7 +83,7 @@ public class ParticleSwarmOptimization {
 			particles[i].fintness = fit(position);
 			
 			// 更新該粒子目前找過之最佳值
-			if(particles[i].fintness > particles[i].bestFitness) {
+			if(particles[i].fintness < particles[i].bestFitness) {
 				particles[i].bestFitness = particles[i].fintness;
 				particles[i].bestPostion = particles[i].position;
 			}
@@ -96,13 +96,13 @@ public class ParticleSwarmOptimization {
 	static double updateVelocity(Particle particle) {
 		//w * v + phi1 * random * (pbest-ppos) + phi2 * random * (gbest-pos);
 		 double velocity = w * particle.velocity + 
-				 phi1 * random.nextFloat() * (particle.bestPostion - particle.position) + 
-				 phi2 * random.nextFloat() * (globalBestParticle.bestPostion - particle.position);
+				 phi1 * random.nextDouble() * (particle.bestPostion - particle.position) + 
+				 phi2 * random.nextDouble() * (globalBestParticle.bestPostion - particle.position);
 		 return velocity;
 	}
 	
 	static void updateGlobalBestFintness(Particle particle) {
-		if(particle.bestFitness > globalBestParticle.bestFitness) {
+		if(particle.bestFitness < globalBestParticle.bestFitness) {
 			globalBestParticle = particle;
 			System.out.println("Now Best Fitness = " + particle.bestFitness);
 			System.out.println("Now Best Position = " + particle.bestPostion);
