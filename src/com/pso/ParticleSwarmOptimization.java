@@ -31,8 +31,8 @@ public class ParticleSwarmOptimization {
 	}
 	
 	static void initialParameter() {
-		maxPosition = 20.0;
-		minPosition = -20.0;
+		maxPosition = 100.0;
+		minPosition = -100.0;
 		maxVelocity = 1.5;
 		minVelocity = -1.5;
 		w = 1.0;
@@ -104,9 +104,10 @@ public class ParticleSwarmOptimization {
 	static void updateGlobalBestFintness(Particle particle) {
 		if(particle.bestFitness < globalBestParticle.bestFitness) {
 			globalBestParticle = particle;
-			System.out.println("Now Best Fitness = " + particle.bestFitness);
-			System.out.println("Now Best Position = " + particle.bestPostion);
+//			System.out.println("Now Best Fitness = " + particle.bestFitness);
+//			System.out.println("Now Best Position = " + particle.bestPostion);
 		}
+		System.out.println("Now Best Fitness = " + globalBestParticle.bestFitness);
 	}
 	
 	static double fit(double x) {
